@@ -1,17 +1,38 @@
 import pygame
 from pygame.locals import *
+
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from skimage import io
 
-# Inicializar Pygame e configurar a tela
-pygame.init()
-display = (800, 600)
-pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
-gluPerspective(45, (display[0] / display[1]), 0.1, 50.0)
-glTranslatef(0.0, 0.0, -5)
+vertices = (
+    (1, -1, -1),
+    (1, 1, -1),
+    (-1, 1, -1),
+    (-1, -1, -1),
+    (1, -1, 1),
+    (1, 1, 1),
+    (-1, -1, 1),
+    (-1, 1, 1)
+    )
 
-# Função para carregar uma imagem e convertê-la em textura
+faces = (
+    (0, 1, 2, 3),
+    (3, 2, 7, 6),
+    (6, 7, 5, 4),
+    (4, 5, 1, 0),
+    (1, 5, 7, 2),
+    (4, 0, 3, 6)
+    )
+
+# Coordenadas de textura para cada vértice
+texture_coords = (
+    (0, 0),
+    (1, 0),
+    (1, 1),
+    (0, 1)
+    )
+
 def load_texture(image_path):
     image = io.imread(image_path)
     image = pygame.image.frombuffer(image.tobytes(), image.shape[1::-1], "RGB")
@@ -24,66 +45,37 @@ def load_texture(image_path):
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.get_width(), image.get_height(), 0, GL_RGB, GL_UNSIGNED_BYTE, texture_data)
     return texture_id
 
-# Carregar a textura
-texture_id = load_texture('BD-Imagem/cachorro.jpg')
-
-# Função para desenhar o cubo
-def draw_cube():
+def Forma():
+    glBindTexture(GL_TEXTURE_2D, texture_id)
     glBegin(GL_QUADS)
-    
-    # Frente
-    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0,  1.0)
-    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0,  1.0)
-    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0,  1.0)
-    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  1.0,  1.0)
-    
-    # Traseira
-    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0, -1.0)
-    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0, -1.0)
-    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0, -1.0)
-    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  1.0, -1.0)
-    
-    # Superior
-    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0,  1.0, -1.0)
-    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0,  1.0, -1.0)
-    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0,  1.0)
-    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0,  1.0,  1.0)
-    
-    # Inferior
-    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0, -1.0)
-    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0, -1.0, -1.0)
-    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0, -1.0,  1.0)
-    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0, -1.0,  1.0)
-    
-    # Direita
-    glTexCoord2f(0.0, 0.0); glVertex3f( 1.0, -1.0, -1.0)
-    glTexCoord2f(1.0, 0.0); glVertex3f( 1.0,  1.0, -1.0)
-    glTexCoord2f(1.0, 1.0); glVertex3f( 1.0,  1.0,  1.0)
-    glTexCoord2f(0.0, 1.0); glVertex3f( 1.0, -1.0,  1.0)
-    
-    # Esquerda
-    glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0, -1.0)
-    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0,  1.0, -1.0)
-    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0,  1.0,  1.0)
-    glTexCoord2f(0.0, 1.0); glVertex3f(-1.0, -1.0,  1.0)
-    
+    for face in faces:
+        for i, vertex in enumerate(face):
+            glTexCoord2f(texture_coords[i][0], texture_coords[i][1])
+            glVertex3fv(vertices[vertex])
     glEnd()
 
-# Habilitar texturas 2D
-glEnable(GL_TEXTURE_2D)
-glBindTexture(GL_TEXTURE_2D, texture_id)
+def Ponto():
+    pygame.init()
+    display = (800, 600)
+    pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
 
-# Loop principal
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    
-    glRotatef(1, 3, 1, 1)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    draw_cube()
-    pygame.display.flip()
-    pygame.time.wait(10)
+    gluPerspective(45, (display[0] / display[1]), 0.1, 50.0)
+    glTranslatef(0.0, 0.0, -5)
 
-pygame.quit()
+    glEnable(GL_TEXTURE_2D)
+    global texture_id
+    texture_id = load_texture('BD-Imagem/cachorro.jpg')
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        glRotatef(1, 3, 1, 1)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        Forma()
+        pygame.display.flip()
+        pygame.time.wait(10)
+
+Ponto()
