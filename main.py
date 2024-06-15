@@ -28,7 +28,7 @@ coordenadas_textura = [
 # Função que gera uma textura a partir de uma imagem
 def Textura():
     # Carregamos a imagem na nossa váriavel
-    imagem = pygame.image.load('BD-Imagem/cachorro.jpg')
+    imagem = pygame.image.load('BD-Imagem/dogo.jpeg')
     # Transformamos a nossa imagem numa string para poder tratar ela
     textura = pygame.image.tostring(imagem, "RGBA", 1)
     # Variavéis das dimensão da nossa imagem
@@ -40,7 +40,7 @@ def Textura():
     texid = glGenTextures(1)
     glBindTexture(GL_TEXTURE_2D, texid)
     # comando que define a imagem da textura no OpenGL.
-    # que recebe algumas variáveis como ipo de textura, nível de detalhe, formato interno,
+    # que recebe algumas variáveis como tipo de textura, nível de detalhe, formato interno,
     # largura, altura, borda, formato da imagem, tipo de dados e os dados da imagem em si.
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textura)
     # São comandos que configuram os parâmetros de empacotamento e filtragem da textura
